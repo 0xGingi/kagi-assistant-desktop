@@ -1,7 +1,7 @@
 {
   "name": "kagi-assistant-desktop",
   "private": true,
-  "version": "0.5.4",
+  "version": "0.5.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,9 +15,9 @@
     "@tauri-apps/plugin-updater": "~2.9.0"
   },
   "devDependencies": {
-    "@types/node": "^24.0.15",
-    "typescript": "~5.8.3",
-    "vite": "^7.0.5",
-    "@tauri-apps/cli": "^2.7.0"
+    "@types/node": "^24.2.1",
+    "typescript": "~5.9.2",
+    "vite": "^7.1.2",
+    "@tauri-apps/cli": "^2.7.1"
   }
 }
