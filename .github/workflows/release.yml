@@ -78,10 +78,8 @@ jobs:
       - name: Verify Certificate (macOS only)
         if: matrix.platform == 'macos-latest'
         run: |
-          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application")
-          CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
-          echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
-          echo "Certificate imported: $CERT_ID"
+          security find-identity -v -p codesigning build.keychain
+          echo "Certificate verification complete"
         
       - uses: tauri-apps/tauri-action@v0
         env:
@@ -91,7 +89,7 @@ jobs:
           # Apple code signing and notarization (macOS only)
           APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
           APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
+          APPLE_SIGNING_IDENTITY: "Developer ID Application: Jonathan Grosswiler (YP8HMR9NR6)"
           APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
           APPLE_API_KEY_PATH: /tmp/apple-api-key.p8

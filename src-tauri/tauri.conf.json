@@ -56,7 +56,7 @@
     },
     "macOS": {
       "minimumSystemVersion": "11.0",
-      "signingIdentity": "FB4311DE3FD634537D441B7358661111988C9269",
+      "signingIdentity": "Developer ID Application: Jonathan Grosswiler (YP8HMR9NR6)",
       "hardenedRuntime": true,
       "entitlements": "entitlements.plist",
       "providerShortName": null,
