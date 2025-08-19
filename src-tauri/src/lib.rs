@@ -38,11 +38,29 @@ pub fn run() {
                 .accelerator("F5")
                 .build(app)?;
 
-            let view_menu = SubmenuBuilder::new(app, "View")
-                .items(&[&reload, &reload_f5])
+            let view_menu = if cfg!(target_os = "macos") {
+                SubmenuBuilder::new(app, "View")
+                    .items(&[&reload])
+                    .build()?
+            } else {
+                SubmenuBuilder::new(app, "View")
+                    .items(&[&reload, &reload_f5])
+                    .build()?
+            };
+
+            let undo = PredefinedMenuItem::undo(app, None)?;
+            let redo = PredefinedMenuItem::redo(app, None)?;
+            let cut = PredefinedMenuItem::cut(app, None)?;
+            let copy = PredefinedMenuItem::copy(app, None)?;
+            let paste = PredefinedMenuItem::paste(app, None)?;
+            let select_all = PredefinedMenuItem::select_all(app, None)?;
+            let edit_sep1 = PredefinedMenuItem::separator(app)?;
+            let edit_sep2 = PredefinedMenuItem::separator(app)?;
+            let edit_menu = SubmenuBuilder::new(app, "Edit")
+                .items(&[&undo, &redo, &edit_sep1, &cut, &copy, &paste, &edit_sep2, &select_all])
                 .build()?;
 
-            let menu = if cfg!(target_os = "macos") {
+        let menu = if cfg!(target_os = "macos") {
                 let about = PredefinedMenuItem::about(app, None, None)?;
                 let services = PredefinedMenuItem::services(app, None)?;
                 let hide = PredefinedMenuItem::hide(app, None)?;
@@ -58,11 +76,11 @@ pub fn run() {
                     .build()?;
 
                 MenuBuilder::new(app)
-                    .items(&[&app_submenu, &view_menu])
+            .items(&[&app_submenu, &edit_menu, &view_menu])
                     .build()?
             } else {
                 MenuBuilder::new(app)
-                    .items(&[&view_menu])
+            .items(&[&edit_menu, &view_menu])
                     .build()?
             };
 
