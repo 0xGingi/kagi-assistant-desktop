@@ -1,6 +1,6 @@
 [package]
 name = "kagi-assistant-desktop"
-version = "0.5.7"       
+version = "0.5.8"       
 description = "Kagi Assistant Desktop Application"
 authors = ["0xGingi"]
 edition = "2021"
