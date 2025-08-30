@@ -36,8 +36,14 @@ fn cleanup_old_uninstall_entries() {
             continue;
         }
 
-        let uninstall_string: String = sub.get_value("UninstallString").unwrap_or_default().to_lowercase();
-        let install_location: String = sub.get_value("InstallLocation").unwrap_or_default().to_lowercase();
+        let uninstall_string: String = sub
+            .get_value::<String, _>("UninstallString")
+            .unwrap_or_default()
+            .to_lowercase();
+        let install_location: String = sub
+            .get_value::<String, _>("InstallLocation")
+            .unwrap_or_default()
+            .to_lowercase();
         let is_our_app = uninstall_string.contains("kagi") || install_location.contains("kagi");
         if !is_our_app {
             continue;
