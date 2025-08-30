@@ -1905,7 +1905,7 @@ dependencies = [
 
 [[package]]
 name = "kagi-assistant-desktop"
-version = "0.5.9"
+version = "0.60"
 dependencies = [
  "serde_json",
  "tauri",
