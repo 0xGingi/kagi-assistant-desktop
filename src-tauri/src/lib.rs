@@ -2,6 +2,55 @@ use tauri_plugin_updater::UpdaterExt;
 use tauri::menu::{MenuBuilder, MenuItemBuilder, SubmenuBuilder, PredefinedMenuItem};
 use tauri::Manager;
 
+#[cfg(target_os = "windows")]
+fn cleanup_old_uninstall_entries() {
+    use winreg::enums::{HKEY_CURRENT_USER, KEY_READ, KEY_SET_VALUE};
+    use winreg::RegKey;
+
+    let current_version = env!("CARGO_PKG_VERSION").to_string();
+    let expected_display_name = "Kagi Assistant";
+
+    let hkcu = RegKey::predef(HKEY_CURRENT_USER);
+    let uninstall_path = "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall";
+    let uninstall = match hkcu.open_subkey_with_flags(uninstall_path, KEY_READ | KEY_SET_VALUE) {
+        Ok(k) => k,
+        Err(_) => return,
+    };
+
+    let mut keys_to_delete: Vec<String> = Vec::new();
+
+    for entry in uninstall.enum_keys() {
+        let key_name = match entry { Ok(n) => n, Err(_) => continue };
+        let sub = match uninstall.open_subkey_with_flags(&key_name, KEY_READ | KEY_SET_VALUE) {
+            Ok(s) => s,
+            Err(_) => continue,
+        };
+
+        let display_name: String = sub.get_value("DisplayName").unwrap_or_default();
+        if display_name != expected_display_name {
+            continue;
+        }
+
+        let display_version: String = sub.get_value("DisplayVersion").unwrap_or_default();
+        if display_version == current_version {
+            continue;
+        }
+
+        let uninstall_string: String = sub.get_value("UninstallString").unwrap_or_default().to_lowercase();
+        let install_location: String = sub.get_value("InstallLocation").unwrap_or_default().to_lowercase();
+        let is_our_app = uninstall_string.contains("kagi") || install_location.contains("kagi");
+        if !is_our_app {
+            continue;
+        }
+
+        keys_to_delete.push(key_name);
+    }
+
+    for key in keys_to_delete {
+        let _ = uninstall.delete_subkey_all(&key);
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -85,6 +134,9 @@ pub fn run() {
             };
 
             app.set_menu(menu)?;
+
+            #[cfg(target_os = "windows")]
+            cleanup_old_uninstall_entries();
 
             let handle = app.handle().clone();
             tauri::async_runtime::spawn(async move {
