@@ -49,6 +49,12 @@
     "shortDescription": "Desktop app for Kagi Assistant",
     "longDescription": "A desktop application that provides a native experience for Kagi Assistant with login support.",
     "createUpdaterArtifacts": true,
+    "windows": {
+      "webviewInstallMode": {
+        "type": "offlineInstaller",
+        "silent": true
+      }
+    },
     "linux": {
       "appimage": {
         "bundleMediaFramework": true
