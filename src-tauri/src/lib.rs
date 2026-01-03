@@ -1,6 +1,8 @@
 use tauri_plugin_updater::UpdaterExt;
+use tauri_plugin_opener::OpenerExt;
 use tauri::menu::{MenuBuilder, MenuItemBuilder, SubmenuBuilder, PredefinedMenuItem};
-use tauri::Manager;
+use tauri::webview::WebviewWindowBuilder;
+use tauri::{Manager, WebviewUrl};
 
 #[cfg(target_os = "windows")]
 fn cleanup_old_uninstall_entries() {
@@ -57,6 +59,14 @@ fn cleanup_old_uninstall_entries() {
     }
 }
 
+/// Check if a URL is internal to Kagi domains
+fn is_kagi_url(url: &url::Url) -> bool {
+    match url.host_str() {
+        Some(host) => host == "kagi.com" || host.ends_with(".kagi.com"),
+        None => false,
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -84,6 +94,49 @@ pub fn run() {
             _ => {}
         })
         .setup(|app| {
+            // Clone handles for use in navigation closures
+            let app_handle = app.handle().clone();
+            let app_handle_for_new_window = app.handle().clone();
+
+            // Create main window programmatically with navigation handlers
+            let _main_window = WebviewWindowBuilder::new(
+                app,
+                "main",
+                WebviewUrl::External("https://kagi.com/assistant".parse().unwrap())
+            )
+            .title("Kagi Assistant")
+            .inner_size(1200.0, 800.0)
+            .min_inner_size(800.0, 600.0)
+            .resizable(true)
+            .center()
+            .visible(true)
+            // Handle regular navigation (clicking links)
+            .on_navigation(move |url| {
+                let scheme = url.scheme();
+
+                // Handle special URL schemes (mailto, tel)
+                if scheme == "mailto" || scheme == "tel" {
+                    let _ = app_handle.opener().open_url(url.as_str(), None::<&str>);
+                    return false;
+                }
+
+                // Allow internal Kagi navigation
+                if is_kagi_url(&url) {
+                    true
+                } else {
+                    // Open external URLs in default browser
+                    let _ = app_handle.opener().open_url(url.as_str(), None::<&str>);
+                    false
+                }
+            })
+            // Handle window.open() and target="_blank" links
+            .on_new_window(move |url, _features| {
+                // Open all new window requests in default browser
+                let _ = app_handle_for_new_window.opener().open_url(url.as_str(), None::<&str>);
+                tauri::webview::NewWindowResponse::Deny
+            })
+            .build()?;
+
             let reload = MenuItemBuilder::new("Reload")
                 .id("reload")
                 .accelerator("CmdOrCtrl+R")
