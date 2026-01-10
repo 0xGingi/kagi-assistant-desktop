@@ -1,6 +1,6 @@
 # Kagi Assistant Desktop
 
-A desktop application for [Kagi Assistant](https://kagi.com/assistant) built with Tauri.
+A desktop application for [Kagi Assistant](https://kagi.com/assistant) built with [Tauri](https://tauri.app/).
 
 * Note: After first time logging in, you be navigated to the kagi.com homepage, after you restart the application you will be sent directly to /assistant each time
 
