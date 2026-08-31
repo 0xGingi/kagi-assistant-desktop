@@ -1,8 +1,10 @@
+Please note: this project is unmaintained. If someone would like to take ownership of this project, please file an issue.
+
 # Kagi Assistant Desktop
 
 A desktop application for [Kagi Assistant](https://kagi.com/assistant) built with [Tauri](https://tauri.app/).
 
-* Note: After first time logging in, you be navigated to the kagi.com homepage, after you restart the application you will be sent directly to /assistant each time
+* Note: After first-time logging in, you will be navigated to the kagi.com homepage; after you restart the application, you will be sent directly to /assistant each time
 
 ![image](https://github.com/user-attachments/assets/4946da7f-94a8-41ff-b3ce-9ab0e8f07d4c)
 
